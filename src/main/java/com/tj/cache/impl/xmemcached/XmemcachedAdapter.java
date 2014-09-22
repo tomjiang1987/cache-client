@@ -1,6 +1,8 @@
 package com.tj.cache.impl.xmemcached;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import net.rubyeye.xmemcached.MemcachedClient;
@@ -31,6 +33,20 @@ public class XmemcachedAdapter implements CacheService {
 			throw new CacheException(memcachedEx);
 		}
 		
+	}
+	
+	@Override
+	public <T> Map<String, T> getAll(final Collection<String> keyCollections)
+			throws InterruptedException, TimeoutException, CacheException {
+		try{
+			return memcachedClient.withNamespace(ns, new MemcachedClientCallable<Map<String, T>>(){
+				public Map<String, T> call(MemcachedClient client) throws MemcachedException,InterruptedException, TimeoutException{
+				      	return client.get(keyCollections);
+				}
+			});
+		}catch(MemcachedException memcachedEx){
+			throw new CacheException(memcachedEx);
+		}
 	}
 
 	@Override

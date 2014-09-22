@@ -1,5 +1,7 @@
 package com.tj.cache;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 public interface CacheService {
@@ -10,4 +12,6 @@ public interface CacheService {
 	
 	public Boolean delete(String key) throws InterruptedException, TimeoutException,CacheException;
 	
+	public <T> Map<String, T> getAll(final Collection<String> keys) throws InterruptedException, TimeoutException,CacheException;
+
 }
