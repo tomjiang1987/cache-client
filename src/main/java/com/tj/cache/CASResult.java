@@ -1,7 +1,7 @@
 package com.tj.cache;
 
 /**
- * operation result
+ * cas result
  */
 public class CASResult <T>{
 	private final long cas;

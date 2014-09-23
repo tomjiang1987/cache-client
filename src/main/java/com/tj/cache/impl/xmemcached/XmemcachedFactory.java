@@ -106,6 +106,7 @@ public class XmemcachedFactory implements FactoryBean<CacheService>, DisposableB
 		if (expireTime < 0) {
 			throw new IllegalArgumentException("expireTime < 0");
 		}
+		
 	}
 
 	public String getServers() {
@@ -145,6 +146,14 @@ public class XmemcachedFactory implements FactoryBean<CacheService>, DisposableB
 
 	public void setExpireTime(int expireTime) {
 		this.expireTime = expireTime;
+	}
+
+	public long getOpTimeout() {
+		return opTimeout;
+	}
+
+	public void setOpTimeout(long opTimeout) {
+		this.opTimeout = opTimeout;
 	}
 
 }

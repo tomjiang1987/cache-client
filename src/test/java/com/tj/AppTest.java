@@ -13,13 +13,17 @@ public class AppTest {
         System.out.println("spring inited");
         
         CacheService cacheService = (CacheService)context.getBean("cacheService");
+        
+        
         String key = "test";
         cacheService.set(key, 0);
         System.out.println(cacheService.get(key));
         
         System.out.println(cacheService.delete(key));
         
+        System.out.println("--expire key--");
         CacheService expireCache = (CacheService)context.getBean("expireCache");
+        System.out.println(expireCache.set(key, 0));
         System.out.println(expireCache.set(key, 0));
         System.out.println(expireCache.get(key));
         System.out.println("sleep 2 seconds...");
