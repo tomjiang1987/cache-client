@@ -35,6 +35,7 @@ public class XmemcachedFactory implements FactoryBean<CacheService>, DisposableB
 		MemcachedClientBuilder builder = this.newBuilder(serverMap,weightsArray);
 		builder.setSessionLocator(new KetamaMemcachedSessionLocator());
 		builder.setConnectionPoolSize(connectionPoolSize);
+		//builder.setSanitizeKeys(true);
 		
 		MemcachedClient memcachedClient = builder.build();
 		memcachedClient.setOpTimeout(opTimeout);

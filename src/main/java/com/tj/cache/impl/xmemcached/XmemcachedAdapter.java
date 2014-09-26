@@ -1,12 +1,12 @@
 package com.tj.cache.impl.xmemcached;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
 
 import net.rubyeye.xmemcached.MemcachedClient;
-import net.rubyeye.xmemcached.MemcachedClientCallable;
 import net.rubyeye.xmemcached.exception.MemcachedException;
 
 import com.tj.cache.CacheException;
@@ -14,7 +14,7 @@ import com.tj.cache.CacheService;
 
 public class XmemcachedAdapter implements CacheService {
 	private int expireTime = 0;
-	private String ns = "default";
+	private String ns = "";
 	private MemcachedClient memcachedClient;
 
 	public XmemcachedAdapter(MemcachedClient memcachedClient) {
@@ -24,26 +24,17 @@ public class XmemcachedAdapter implements CacheService {
 	@Override
 	public <T> T get(final String key) throws InterruptedException, TimeoutException,CacheException {
 		try{
-			return memcachedClient.withNamespace(ns, new MemcachedClientCallable<T>(){
-				public T call(MemcachedClient client) throws MemcachedException,InterruptedException, TimeoutException{
-				      	return client.get(key);
-				}
-			});
+			return memcachedClient.get(this.addNs(key));
 		}catch(MemcachedException memcachedEx){
 			throw new CacheException(memcachedEx);
 		}
-		
 	}
 	
 	@Override
 	public <T> Map<String, T> getAll(final Collection<String> keyCollections)
 			throws InterruptedException, TimeoutException, CacheException {
 		try{
-			return memcachedClient.withNamespace(ns, new MemcachedClientCallable<Map<String, T>>(){
-				public Map<String, T> call(MemcachedClient client) throws MemcachedException,InterruptedException, TimeoutException{
-				      	return client.get(keyCollections);
-				}
-			});
+			return memcachedClient.get(this.addNs(keyCollections));
 		}catch(MemcachedException memcachedEx){
 			throw new CacheException(memcachedEx);
 		}
@@ -52,11 +43,7 @@ public class XmemcachedAdapter implements CacheService {
 	@Override
 	public <T> Boolean set(final String key, final T value) throws InterruptedException, TimeoutException,CacheException{
 		try{
-			return memcachedClient.withNamespace(ns, new MemcachedClientCallable<Boolean>(){
-				public Boolean call(MemcachedClient client) throws MemcachedException,InterruptedException, TimeoutException{
-				      	return client.set(key, expireTime, value);
-				}
-			});
+			return memcachedClient.set(this.addNs(key), expireTime, value);
 		}catch(MemcachedException memcachedEx){
 			throw new CacheException(memcachedEx);
 		}
@@ -65,22 +52,37 @@ public class XmemcachedAdapter implements CacheService {
 	@Override
 	public Boolean delete(final String key) throws InterruptedException, TimeoutException,CacheException{
 		try{
-			return memcachedClient.withNamespace(ns, new MemcachedClientCallable<Boolean>(){
-				public Boolean call(MemcachedClient client) throws MemcachedException,InterruptedException, TimeoutException{
-				      	return client.delete(key);
-				}
-			});
+			return memcachedClient.delete(this.addNs(key));
 		}catch(MemcachedException memcachedEx){
 			throw new CacheException(memcachedEx);
 		}
 	}
 
+	
+
+	private String addNs(String key){
+		if(key == null){
+			throw new IllegalArgumentException("key is null");
+		}
+		
+		return "/" + ns + ":" + key;
+	}
+	
+	private Collection<String> addNs(final Collection<String> keyCollections){
+		Collection<String> rs = new ArrayList<String>();
+		for(String key: keyCollections){
+			rs.add(this.addNs(key));
+		}
+		return rs;
+	}
+	
 	public void shutdown() throws IOException {
 		if (this.memcachedClient != null) {
 			this.memcachedClient.shutdown();
 		}
 	}
-
+	
+	//getters and setters
 	public int getExpireTime() {
 		return expireTime;
 	}
