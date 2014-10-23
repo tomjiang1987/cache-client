@@ -65,7 +65,10 @@ public class XmemcachedAdapter implements CacheService {
 			throw new IllegalArgumentException("key is null");
 		}
 		
-		return "/" + ns + ":" + key;
+		return new StringBuilder(64).append("/default/")
+									.append(ns)
+									.append(":")
+									.append(key).toString();
 	}
 	
 	private Collection<String> addNs(final Collection<String> keyCollections){
